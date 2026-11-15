@@ -1,39 +1,29 @@
 """
     in : list of rows
-    out : month, day, time, ip, user, status for sshd service
+    out : datetime, ip, user, failed, invalid user for sshd service, success
 """
 
 import logging
 import re
 
 logger = logging.getLogger(__name__)
-
-# Votre pattern : découpe une ligne de log en mois, jour, heure, serveur, service, message
-pattern = re.compile(
-    r'(?P<month>\w{3})\s+(?P<day>\d{1,2})\s+(?P<time>\d{2}:\d{2}:\d{2})'
-    r'\s+(?P<server>\w+)\s+(?P<service>\w+)\[\d+\]:\s+(?P<message>.+)'
-)
-
-# Adresse IP : le mot qui suit "from"
-ip_pattern = re.compile(r'from\s+(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
-
-# Utilisateur : le mot juste avant "from"
-user_pattern = re.compile(r'(?P<user>\S+)\s+from')
-
+pattern = re.compile(r'(?P<month>\w{3})\s+(?P<day>\d{1,2})\s+(?P<time>\d{2}:\d{2}:\d{2})\s+(?P<server>\w+)\s+(?P<service>\w+)\[\d+\]:\s+(?P<message>.+)')
+# Pour trouver l'adresse IP dans le message
+IP_PATTERN = re.compile(r'\b(?:\d{1,3}\.){3}\d{1,3}\b')
+# Pour trouver le nom d'utilisateur : "for root from" ou "Invalid user admin from"
+USER_PATTERN = re.compile(r'(for|user) (?P<user>\S*) from')
 
 def classify_event(message):
-    """Renvoie 'Success', 'Failed', 'Invalid' ou None."""
+
     lowered = message.lower()
-
-    if 'accepted password' in lowered or 'accepted publickey' in lowered:
-        return 'Success'
-    if 'failed password' in lowered:
-        return 'Failed'
-    # startswith : "Connection closed by invalid user ..." ne doit pas compter
-    if lowered.startswith('invalid user'):
-        return 'Invalid'
+    if "accepted password" in lowered or "accepted publickey" in lowered:
+        return "Success"
+    if "failed password" in lowered:
+        return "Failed"
+    # Seule la ligne qui COMMENCE par "Invalid user" est une vraie tentative
+    if lowered.startswith("invalid user"):
+        return "Invalid"
     return None
-
 
 def extract_from_row(row):
     """Analyse une ligne : renvoie un dict, ou None si ce n'est pas une tentative sshd."""
@@ -49,26 +39,26 @@ def extract_from_row(row):
     if status is None:
         return None
 
-    ip_match = re.search(ip_pattern, message)
-    if not ip_match:
+    ips = IP_PATTERN.findall(message)
+    if not ips:
         logger.warning("IP introuvable : " + message)
         return None
 
-    user_match = re.search(user_pattern, message)
+    user_match = re.search(USER_PATTERN, message)
+    user = ''
     if user_match:
         user = user_match['user']
-    else:
+    if user == '':
         user = '(vide)'
 
     return {
         'month': match['month'],
         'day': match['day'],
         'time': match['time'],
-        'ip': ip_match['ip'],
+        'ip': ips[0],
         'user': user,
         'status': status,
     }
-
 
 def extract(rows):
     """Analyse toutes les lignes et garde seulement les tentatives sshd."""
@@ -81,14 +71,37 @@ def extract(rows):
     logger.info(str(len(records)) + " tentatives sshd extraites")
     return records
 
+def count_by_user(records, status):
+    """Compte le nombre de tentatives par utilisateur pour un statut donné."""
+    counts = {}
+    for r in records:
+        if r['status'] == status:
+            user = r['user']
+            if user in counts:
+                counts[user] += 1
+            else:
+                counts[user] = 1
+    return counts
+
+def count_by_ip(records):
+    """{ip: {'Success': n, 'Failed': n, 'Invalid': n}}"""
+    counts = {}
+    for r in records:
+        ip = r['ip']
+        if ip not in counts:
+            counts[ip] = {'Success': 0, 'Failed': 0, 'Invalid': 0}
+        counts[ip][r['status']] += 1
+    return counts
+
 
 if __name__ == "__main__":
-    tests = [
-        "May 24 00:04:36 ns sshd[1350968]: Connection closed by 127.0.0.1 port 40940 [preauth]",
-        "May 24 00:09:01 ns CRON[1351002]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)",
-        "May 24 00:26:59 ns sshd[1351208]: Connection closed by invalid user  45.156.87.204 port 35940 [preauth]",
-        "May 24 00:27:57 ns sshd[1351222]: Invalid user test from 45.156.87.204 port 41740",
-        "May 24 00:28:00 ns sshd[1351222]: Failed password for invalid user test from 45.156.87.204 port 41740 ssh2",
-    ]
-    for t in tests:
-        print(extract_from_row(t))
+    from ingestion import raw
+
+    rows = raw.to_rows('./data')
+    records = extract(rows)
+
+    print("Tentatives sshd :", len(records))
+    print("Succès par utilisateur :", count_by_user(records, 'Success'))
+    print("Nombre d'utilisateurs invalides :", len(count_by_user(records, 'Invalid')))
+    print("Nombre d'IP différentes :", len(count_by_ip(records)))
+    print(records[:3])
