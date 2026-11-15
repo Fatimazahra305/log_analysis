@@ -21,6 +21,14 @@ Le dossier data n'est pas sur GitHub. Il faut le creer et y mettre les fichiers 
 - storage/app.log : fichier ou sont ecrites les erreurs et les infos
 
 # Ce que j'ai trouve
+Tentatives sshd : 14129
+Success : 1
+Failed : 10962
+Invalid : 3166
+Succès par utilisateur : {'adminesisa': 1}
+Invalid par utilisateur (top 5) : [('admin', 407), ('esisa', 193), ('ubuntu', 144), ('user', 109), ('test', 82)]
+Noms invalides différents : 959
+IP différentes (Failed) : 1852
 
 Sur mes 4 fichiers : 65 565 lignes lues, dont 14 129 tentatives sshd (10 962 échouées,959 un utilisateur invalide et 1 seule réussie).
 
