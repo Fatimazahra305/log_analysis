@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 def run_pipeline():
-    logger.info("Démarrage du pipeline")
+    logger.info("Demarrage du pipeline")
 
     # 1. Lecture des fichiers
     rows = raw.to_rows(DATA_DIR)
@@ -40,8 +40,7 @@ def run_pipeline():
     # 2. Extraction des tentatives sshd
     records = extract_transforme.extract(rows)
     if not records:
-        logger.error("Aucune tentative sshd trouvée")
-        print("Aucune tentative trouvée, voir " + LOG_FILE)
+        logger.error("Aucune tentative sshd trouvee")
         return
 
     # 3. Affichage des graphiques
