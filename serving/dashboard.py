@@ -36,15 +36,15 @@ def draw_bar(counts, title, xlabel, ylabel):
 
 
 def build_dashboard(records):
-    """Prépare les trois graphiques demandés, puis les affiche."""
-    # 1. Tentatives échouées par pays
+    """Prepare les trois graphiques demandes, puis les affiche."""
+    # 1. Tentatives echouees par pays
     draw_bar(geo_location.count_by_country(records, 'Failed'),
              'Tentatives échouées par pays',
              'Pays', 'Nombre de tentatives')
 
-    # 2. Connexions réussies par utilisateur
+    # 2. Connexions reussies par utilisateur
     draw_bar(extract_transforme.count_by_user(records, 'Success'),
-             'Connexions réussies par utilisateur',
+             'Connexions reussies par utilisateur',
              'Utilisateur', 'Nombre de connexions')
 
     # 3. Tentatives avec "Invalid user"
@@ -52,7 +52,7 @@ def build_dashboard(records):
              'Tentatives avec Invalid user',
              'Utilisateur', 'Nombre de tentatives')
 
-    # Affiche les trois fenêtres en même temps
+    # Affiche les trois fenetres en meme temps
     try:
         plt.show()
     except Exception as e:
