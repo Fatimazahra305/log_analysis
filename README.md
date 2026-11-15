@@ -30,7 +30,7 @@ Invalid par utilisateur (top 5) : [('admin', 407), ('esisa', 193), ('ubuntu', 14
 Noms invalides différents : 959
 IP différentes (Failed) : 1852
 
-Sur mes 4 fichiers : 65 565 lignes lues, dont 14 129 tentatives sshd (10 962 échouées,959 un utilisateur invalide et 1 seule réussie).
+Sur mes 4 fichiers : 65 565 lignes lues, dont 14 129 tentatives sshd (10 962 ehouees 959 utilisateur invalide et 1 seule réussie).
 
 « 3 166 tentatives avec un utilisateur invalide, venant de 959 noms différents »
 
@@ -48,10 +48,10 @@ Chaque module écrit ses erreurs dans storage/app.log (dossier introuvable, fich
 
 # En resume voici ce que fait le projet:
 
-Il lit tous les fichiers de logs du dossier data (auth.log.1, auth.log.2 et les fichiers compressés .gz).
+Il lit tous les fichiers de logs du dossier data (auth.log.1, auth.log.2 et les fichiers compresses .gz).
 Il regroupe toutes les lignes en une seule liste : 65 565 lignes au total.
 Il ne garde que celles du service sshd, qui concernent les tentatives de connexion SSH.
-Il classe chaque tentative en trois types : Success (connexion réussie), Failed (mot de passe échoué) ou Invalid (utilisateur inexistant).
+Il classe chaque tentative en trois types : Success (connexion réussie), Failed (mot de passe echoue)ou Invalid (utilisateur inexistant).
 Pour chaque tentative, il retient la date, l’heure, l’adresse IP, l’utilisateur et le statut : 14 129 tentatives en tout.
 Il interroge ipinfo.io pour trouver le pays des 100 IP les plus actives, et regroupe les autres dans « Autres ».
 Il affiche trois graphiques : échecs par pays, connexions réussies par utilisateur et tentatives avec Invalid user.
