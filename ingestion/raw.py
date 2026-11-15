@@ -1,21 +1,18 @@
+import gzip
+import logging
+from pathlib import Path
+
 """
 Read from data all files
 in: data [directory]
 out: list of rows
 """
-
-import gzip
-import logging
-from pathlib import Path
-
 logger = logging.getLogger(__name__)
-
 
 def to_rows(path: str):
     rows = []
     data_dir = Path(path)
 
-    # 1. Lecture du contenu du dossier
     try:
         files = sorted(data_dir.iterdir())
     except FileNotFoundError:
@@ -28,15 +25,13 @@ def to_rows(path: str):
         logger.error(f"{path} : ce n'est pas un dossier")
         return rows
 
-    # 2. Lecture de chaque fichier
     for file_path in files:
 
-        # On ignore les sous-dossiers
         if not file_path.is_file():
             continue
 
         try:
-            # Un fichier .gz est compressé : on l'ouvre avec gzip
+           
             if file_path.suffix == '.gz':
                 with gzip.open(file_path, mode='rt', encoding='utf-8', errors='replace') as f:
                     lines = f.readlines()
