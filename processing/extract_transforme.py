@@ -82,7 +82,7 @@ def extract(rows):
 
 
 def count_by_user(records, status):
-    """Pour un statut donné, renvoie {utilisateur: nombre d'événements}."""
+    """Pour un statut donne renvoie {utilisateur: nombre d'evnements}."""
     result = {}
     for record in records:
         if record['status'] == status:
@@ -92,7 +92,7 @@ def count_by_user(records, status):
 
 
 def count_by_ip(records, status):
-    """Pour un statut donné, renvoie {ip: nombre d'événements}."""
+    """Pour un statut donne, renvoie {ip: nombre d'evenements}."""
     result = {}
     for record in records:
         if record['status'] == status:
@@ -113,9 +113,9 @@ if __name__ == "__main__":
         total = len([r for r in records if r['status'] == status])
         print(status, ":", total)
 
-    print("Succès par utilisateur :", count_by_user(records, 'Success'))
+    print("Succes par utilisateur :", count_by_user(records, 'Success'))
     print("Invalid par utilisateur (top 5) :",
           sorted(count_by_user(records, 'Invalid').items(),
                  key=lambda x: x[1], reverse=True)[:5])
-    print("Noms invalides différents :", len(count_by_user(records, 'Invalid')))
-    print("IP différentes (Failed) :", len(count_by_ip(records, 'Failed')))
+    print("Noms invalides differents :", len(count_by_user(records, 'Invalid')))
+    print("IP differentes (Failed) :", len(count_by_ip(records, 'Failed')))
