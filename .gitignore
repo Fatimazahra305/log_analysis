@@ -8,3 +8,8 @@ wheels/
 
 # Virtual environments
 .venv
+# Données et fichiers générés
+data/
+storage/
+output/
+.env
