@@ -39,7 +39,7 @@ def build_dashboard(records):
     """Prepare les trois graphiques demandes, puis les affiche."""
     # 1. Tentatives echouees par pays
     draw_bar(geo_location.count_by_country(records, 'Failed'),
-             'Tentatives échouées par pays',
+             'Tentatives echouees par pays',
              'Pays', 'Nombre de tentatives')
 
     # 2. Connexions reussies par utilisateur
